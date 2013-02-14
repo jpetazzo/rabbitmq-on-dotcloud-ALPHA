@@ -1,0 +1,18 @@
+#!/bin/sh
+
+VERSION=3.0.2
+TARBALL=rabbitmq-server-generic-unix-$VERSION.tar.gz
+URL=http://www.rabbitmq.com/releases/rabbitmq-server/v$VERSION/$TARBALL
+wget $URL
+tar -C$HOME -zxf $TARBALL
+ln -s $HOME/rabbitmq_server-$VERSION $HOME/rabbitmq_server
+cp $(dirname $0)/run $HOME/run
+
+PWFILE=$HOME/password
+if [ ! -f $PWFILE ]
+then
+  dd if=/dev/urandom bs=1 count=8 | base64 > $PWFILE
+  echo "Password was generated in $PWFILE: $(cat $PWFILE)"
+else
+  echo "Remember, the password is in $PWFILE."
+fi

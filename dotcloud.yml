@@ -1,0 +1,7 @@
+mq:
+  type: custom
+  buildscript: rabbitmq/builder
+  ports:
+   amqp: tcp
+  systempackages:
+    - erlang

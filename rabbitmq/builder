@@ -1,14 +1,31 @@
 #!/bin/sh
 
-VERSION=3.0.2
+set -e
+
+VERSION=3.1.0
 TARBALL=rabbitmq-server-generic-unix-$VERSION.tar.gz
 URL=http://www.rabbitmq.com/releases/rabbitmq-server/v$VERSION/$TARBALL
-wget $URL
-tar -C$HOME -zxf $TARBALL
-ln -s $HOME/rabbitmq_server-$VERSION $HOME/rabbitmq_server
-cp $(dirname $0)/run $HOME/run
+
+echo 'Checking if latest version of Rabbitmq is installed'
+if [ ! -d  $HOME/rabbitmq_server-$VERSION]; then
+
+    echo 'Latest version of Rabbitmq is not installed'
+
+    echo 'Downloading Rabbitmq'
+    wget $URL
+
+    echo 'Unzipping rabbitmq tarball'
+    tar -C$HOME -zxf $TARBALL
+
+    echo 'Linking rabbitmq_server-$VERSION to rabbitmq_server'
+    ln -s $HOME/rabbitmq_server-$VERSION $HOME/rabbitmq_server
+else
+    echo 'Latest version of Rabbitmq already installed'
+fi
+
 
 PWFILE=$HOME/password
+
 if [ ! -f $PWFILE ]
 then
   dd if=/dev/urandom bs=1 count=8 | base64 > $PWFILE
@@ -16,3 +33,13 @@ then
 else
   echo "Remember, the password is in $PWFILE."
 fi
+
+cat > $HOME/profile <<EOF
+
+    export RABBITMQ_CONFIG_FILE=$HOME/rabbitmq
+
+    export RABBITMQ_LOG_BASE=/var/log/supervisor
+
+    export PATH=$PATH:$HOME/rabbitmq_server/sbin/
+
+EOF

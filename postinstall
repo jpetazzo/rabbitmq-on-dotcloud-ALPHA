@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+source $HOME/profile
+
+echo "setting rabbit config file $HOME/rabbitmq.config "
+cat >$HOME/rabbitmq.config <<EOF
+[
+    {rabbit, [
+        {tcp_listeners, [$PORT_AMQP]},
+        {vm_memory_high_watermark, 0.001},
+        {default_user, <<"rabbitmq">>},
+        {default_pass, <<"$(cat $HOME/password)">>}
+    ]},
+    {
+        rabbitmq_management, [
+            {http_log_dir, "/var/log/supervisor/"},
+            {listener, [{port, $PORT_WWW}]}
+    ]}
+]
+EOF
+
+echo "Enabling plugins"
+rabbitmq-plugins enable rabbitmq_management
+
+echo "Exiting script"
+
+exit 0

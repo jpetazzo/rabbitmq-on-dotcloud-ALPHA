@@ -1,11 +1,34 @@
 #!/bin/sh
+# Exit on the first error
+set -e
+
+# All echo output will go to the build log. View with 'dotcloud dlogs'
+echo "START BUILDER SCRIPT"
 
 VERSION=3.0.2
 TARBALL=rabbitmq-server-generic-unix-$VERSION.tar.gz
 URL=http://www.rabbitmq.com/releases/rabbitmq-server/v$VERSION/$TARBALL
-wget $URL
-tar -C$HOME -zxf $TARBALL
-ln -s $HOME/rabbitmq_server-$VERSION $HOME/rabbitmq_server
+DESTDIR=$HOME/rabbitmq_server-$VERSION 
+SYMLINK=$HOME/rabbitmq_server
+
+if [ ! -d $DESTDIR ]
+then
+  echo "Fetching $TARBALL to create $DESTDIR"
+  wget $URL
+  tar -C$HOME -zxf $TARBALL
+  if [ -L $SYMLINK ]
+  then
+    echo "Looks like you have an old link to $SYMLINK. Removing and replacing."
+    rm $SYMLINK
+  fi
+  ln -s $DESTDIR $SYMLINK
+else
+  echo "I believe I already have $DESTDIR ..."
+  ls -l $HOME
+  echo "---------------------------------------------"
+fi
+
+# The default process will be 'run' and should be in the HOME directory
 cp $(dirname $0)/run $HOME/run
 
 PWFILE=$HOME/password

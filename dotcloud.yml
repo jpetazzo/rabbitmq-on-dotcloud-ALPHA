@@ -3,5 +3,6 @@ mq:
   buildscript: rabbitmq/builder
   ports:
    amqp: tcp
+   www: http
   systempackages:
     - erlang

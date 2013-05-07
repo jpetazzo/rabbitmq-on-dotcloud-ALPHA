@@ -5,7 +5,7 @@ set -e
 # All echo output will go to the build log. View with 'dotcloud dlogs'
 echo "START BUILDER SCRIPT"
 
-VERSION=3.0.2
+VERSION=3.1.0
 TARBALL=rabbitmq-server-generic-unix-$VERSION.tar.gz
 URL=http://www.rabbitmq.com/releases/rabbitmq-server/v$VERSION/$TARBALL
 DESTDIR=$HOME/rabbitmq_server-$VERSION

@@ -1,0 +1,39 @@
+#!/bin/sh
+# Exit on the first error
+set -e
+# All echo output will go to /var/log/{servicename}.log
+echo "-------------------------"
+echo "START DOTCLOUD RUN SCRIPT"
+
+export RABBITMQ_CONFIG_FILE=$HOME/rabbitmq
+
+echo "Calculate high watermark size"
+# Set this to the value of your dotcloud scale myservice:memory=MYRAM. Leave some space for Rabbit itself.
+# You could get fancy and use dotcloud env set to set a variable and read it in from that.
+MYRAM=200
+# This gets the amount of RAM in megabytes on the whole system and then calculates the fraction equivalent to MYRAM
+HIGHWATER=`python -c "import os;sysmem=os.popen(\"free -m\").readlines()[1].split()[1];print $MYRAM/float(sysmem)"`
+echo "High water mark for RabbitMQ = $HIGHWATER"
+
+# Note PORT_AMQP and PORT_WWW come from requesting ports in dotcloud.yml with names amqp and www
+echo "Keeping the ports, password and high water mark up to date by refreshing $RABBITMQ_CONFIG_FILE"
+cat >$RABBITMQ_CONFIG_FILE.config <<EOF
+[
+  {rabbit, [
+    {tcp_listeners, [$PORT_AMQP]},
+    {vm_memory_high_watermark, $HIGHWATER},
+    {default_user, <<"rabbitmq">>},
+    {default_pass, <<"$(cat $HOME/password)">>}
+  ]},
+  {rabbitmq_management, [
+    {http_log_dir, "/var/log/supervisor/"},
+    {listener, [{port, $PORT_WWW}]}
+  ]}
+].
+EOF
+
+echo "Enabling the management plugin"
+$HOME/rabbitmq_server/sbin/rabbitmq-plugins enable rabbitmq_management
+
+echo "Starting the server. Exec replaces this script with the server start"
+exec $HOME/rabbitmq_server/sbin/rabbitmq-server

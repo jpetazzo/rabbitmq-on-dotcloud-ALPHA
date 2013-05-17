@@ -39,3 +39,15 @@ then
 else
   echo "Remember, the password is in $PWFILE."
 fi
+
+cat > $HOME/profile <<EOF
+
+    export RABBITMQ_CONFIG_FILE=$HOME/rabbitmq
+
+    export RABBITMQ_LOG_BASE=/var/log/supervisor
+
+    export PATH=$PATH:$HOME/rabbitmq_server/sbin/
+
+    export RABBITMQ_MNESIA_BASE=$HOME/data/
+
+EOF

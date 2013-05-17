@@ -1,5 +1,3 @@
-# RabbitMQ on Dotcloud
-
 ## Introduction
 To run RabbitMQ on dotcloud use the following three commands.
 

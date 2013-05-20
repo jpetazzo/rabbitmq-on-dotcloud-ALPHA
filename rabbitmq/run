@@ -10,7 +10,7 @@ export RABBITMQ_CONFIG_FILE=$HOME/rabbitmq
 echo "Calculate high watermark size"
 # Set this to the value of your dotcloud scale myservice:memory=MYRAM. Leave some space for Rabbit itself.
 # You could get fancy and use dotcloud env set to set a variable and read it in from that.
-MYRAM=200
+MYRAM=${DOTCLOUD_RABBITMQ_HIGHWATERMARK:-32}
 # This gets the amount of RAM in megabytes on the whole system and then calculates the fraction equivalent to MYRAM
 HIGHWATER=`python -c "import os;sysmem=os.popen(\"free -m\").readlines()[1].split()[1];print $MYRAM/float(sysmem)"`
 echo "High water mark for RabbitMQ = $HIGHWATER"
@@ -33,7 +33,7 @@ cat >$RABBITMQ_CONFIG_FILE.config <<EOF
 EOF
 
 echo "Enabling the management plugin"
-$HOME/rabbitmq_server/sbin/rabbitmq-plugins enable rabbitmq_management
+rabbitmq-plugins enable rabbitmq_management
 
 echo "Starting the server. Exec replaces this script with the server start"
-exec $HOME/rabbitmq_server/sbin/rabbitmq-server
+exec rabbitmq-server

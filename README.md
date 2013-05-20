@@ -30,6 +30,10 @@ The build script creates a default user called `rabbitmq` with a password that i
 RabbitMQ is set with a default hightide mark for memory of 32M you can adjust this by setting an environment variable called RABBITMQ_HIGHWATERMARK
 
     dotcloud env set RABBITMQ_HIGHWATERMARK=128
+    
+Make sure you don't give RabbitMQ more memory than you have given to your service. You can scale the service verticaly with the command
+
+    dotcloud scale mq:memory=256M
 
 
 ### Limitations
